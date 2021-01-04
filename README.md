@@ -1,4 +1,4 @@
-# AdminPro - ackend
+# AdminPro - backend
 
 Recuerden ejecutar
 ```
