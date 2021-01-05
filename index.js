@@ -13,12 +13,8 @@ app.use(cors());
 dbConnection();
 
 // Rutas
-app.get("/", (req, res) => {
-  res.json({
-    ok: true,
-    msg: "Todo bien",
-  });
-});
+app.use("/api/users", require('./routes/users.route'));
+
 
 app.listen(process.env.PORT, () => {
   console.log("Servidor Corriendo en puerto", process.env.PORT);
