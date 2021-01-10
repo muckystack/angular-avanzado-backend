@@ -1,6 +1,6 @@
 const { response } = require("express");
-const { validationResult } = require("express-validator");
 const User = require("../models/users.model");
+const bcrypt = require('bcryptjs');
 
 const getUsers = async (req, res) => {
   const users = await User.find({}, "name mail role google");
@@ -12,12 +12,7 @@ const getUsers = async (req, res) => {
 };
 
 const createUser = async (req, res = response) => {
-  const { name, email, password } = req.body;
-
-  const errors = validationResult(req);
-  console.log(errors);
-  if (!errors.isEmpty())
-    return res.status(400).json({ ok: false, errors: errors.mapped() });
+  const { email, password } = req.body;
 
   try {
     const existEmail = await User.findOne({ email });
@@ -28,7 +23,14 @@ const createUser = async (req, res = response) => {
         .json({ ok: false, msg: "El correo ya esta registrado" });
 
     const user = new User(req.body);
+    
+    // Encriptar contraseña
+    const salt = bcrypt.genSaltSync();
+    user.password = bcrypt.hashSync(password, salt);
+
+    // Guardar el usuario
     await user.save();
+    
 
     res.json({
       ok: true,
