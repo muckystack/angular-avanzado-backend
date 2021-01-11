@@ -55,11 +55,10 @@ const updateUser = async (req, res = response) => {
       });
 
     // Actualizaciones
-    const campos = req.body;
-    if (userDB.email === req.body.email) {
-      delete campos.email;
-    } else {
-      const existEmail = await User.findOne({ email: req.body.email });
+    const { password, google, email, ...campos } = req.body;
+
+    if (userDB.email !== email) {
+      const existEmail = await User.findOne({ email });
       if (existEmail)
         return res.status(400).json({
           ok: false,
@@ -67,7 +66,7 @@ const updateUser = async (req, res = response) => {
         });
     }
 
-    delete campos.password, delete campos.google;
+    campos.email = email;
 
     const userUpdated = await User.findByIdAndUpdate(uid, campos, {
       new: true,
@@ -83,8 +82,34 @@ const updateUser = async (req, res = response) => {
   }
 };
 
+const deleteUser = async (req, res = response) => {
+  const uid = req.params.id;
+
+  try {
+    // TODO: Validar token y comprobar si es el usuario correcto
+
+    const userDB = await User.findById(uid);
+    if (!userDB)
+      return res.status(404).json({
+        ok: false,
+        msg: "No existe un usuario por ese id",
+      });
+
+    await User.findByIdAndDelete(uid);
+
+    res.json({
+      ok: true,
+      msg: 'Usuario eliminado',
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ ok: false, msg: "Hable con el administrador" });
+  }
+};
+
 module.exports = {
   getUsers,
   createUser,
   updateUser,
+  deleteUser,
 };
