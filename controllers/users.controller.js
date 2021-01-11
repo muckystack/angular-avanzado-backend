@@ -4,11 +4,12 @@ const bcrypt = require("bcryptjs");
 const { generateJWT } = require("../helpers/jwt.helper");
 
 const getUsers = async (req, res) => {
-  const users = await User.find({}, "name mail role google");
+  const users = await User.find({}, "name email role google");
 
   res.json({
     ok: true,
     users,
+    uid: req.uid
   });
 };
 
